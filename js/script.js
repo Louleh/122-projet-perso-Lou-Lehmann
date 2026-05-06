@@ -11,7 +11,8 @@ const courses = [
         par: 70,
         rating: 5,
         yearFounded: 1906,
-        image: "https://placehold.co/400x300/c0392b/white?text=Golf+Club+Crans-sur-Sierre"
+        image: "/assets/img/GC_Crans-Montana.jpg",
+        credit: "https://www.crans-montana.ch/"
     },
     {
         id: 2,
@@ -22,7 +23,8 @@ const courses = [
         par: 72,
         rating: 4,
         yearFounded: 1995,
-        image: "https://placehold.co/400x300/c0392b/white?text=Golf+Club+de+Sion"
+        image:"/assets/img/GC_Sion.jpg",
+        credit: "https://www.golfsion.ch/"
     },
     {
         id: 3,
@@ -33,7 +35,8 @@ const courses = [
         par: 71,
         rating: 5,
         yearFounded: 1921,
-        image: "https://placehold.co/400x300/2980b9/white?text=Golf+Club+Lausanne"
+        image:"/assets/img/GC_Lausanne.jpg",
+        credit: "https://golflausanne.ch/"
     },
     {
         id: 4,
@@ -44,7 +47,8 @@ const courses = [
         par: 72,
         rating: 4,
         yearFounded: 1900,
-        image: "https://placehold.co/400x300/2980b9/white?text=Golf+Club+Montreux"
+        image: "/assets/img/GC_Montreux.webp",
+        credit: "https://www.golfmontreux.ch/"
     },
     {
         id: 5,
@@ -55,7 +59,8 @@ const courses = [
         par: 72,
         rating: 5,
         yearFounded: 1922,
-        image: "https://placehold.co/400x300/8e44ad/white?text=Golf+Club+de+Geneve"
+        image: "/assets/img/GC_Geneve.webp",
+        credit: "https://golfgeneve.ch/"
     },
     {
         id: 6,
@@ -66,7 +71,8 @@ const courses = [
         par: 72,
         rating: 3,
         yearFounded: 1982,
-        image: "https://placehold.co/400x300/2980b9/white?text=Golf+Club+de+Bonmont"
+        image: "/assets/img/GC_Bonmont.jpg",
+        credit: "https://www.bonmont.com/"
     },
     {
         id: 7,
@@ -77,7 +83,8 @@ const courses = [
         par: 72,
         rating: 4,
         yearFounded: 1932,
-        image: "https://placehold.co/400x300/16a085/white?text=Golf+Club+Zurich-Zumikon"
+        image: "/assets/img/GC_Zurich.jpg",
+        credit: "https://www.gccz.ch/"
     },
     {
         id: 8,
@@ -88,7 +95,8 @@ const courses = [
         par: 70,
         rating: 3,
         yearFounded: 2007,
-        image: "https://placehold.co/400x300/f39c12/white?text=Golf+Club+Domat-Ems"
+        image: "/assets/img/GC_Domat.jpg",
+        credit: "https://www.golfdomatems.ch/golf/"
     },
     {
         id: 9,
@@ -99,7 +107,8 @@ const courses = [
         par: 70,
         rating: 4,
         yearFounded: 1923,
-        image: "https://placehold.co/400x300/2c3e50/white?text=Golf+Club+Lugano"
+        image: "/assets/img/GC_Lugano.jpg",
+        credit: "https://www.golflugano.ch/"
     },
     {
         id: 10,
@@ -110,25 +119,46 @@ const courses = [
         par: 69,
         rating: 2,
         yearFounded: 1963,
-        image: "https://placehold.co/400x300/27ae60/white?text=Golf+Club+Interlaken-Unterseen"
+        image: "/assets/img/GC_Interlaken.webp",
+        credit : "https://www.interlakengolf.ch/"
     }
 
 ];
 
 const listElement = document.querySelector("#list");
+const btnSort = document.getElementById("btn-sort");
+const searchInput = document.getElementById("search");
 
-function afficherRessources() {
+let sortAsc = false;
+
+// Events listeners
+searchInput.addEventListener("input", refresh);
+
+btnSort.addEventListener("click", () => {
+    sortAsc = !sortAsc;
+    btnSort.textContent = sortAsc ? "Trier par note ↑" : "Trier par note ↓";
+    refresh();
+});
+
+function afficherRessources(dataToDisplay) {
     let html = "";
 
-    for (const course of courses) {
+    if (dataToDisplay.length === 0) {
+        listElement.innerHTML = "<p>Aucun parcours trouvé.</p>";
+        return;
+    }
+
+    for (const course of dataToDisplay) {
         html += `
             <article class="golf-card">
                 <img src="${course.image}" alt="Photo du ${course.name}">
+                <a href="${course.credit}">Credit</a>
                 <div class="card-content">
                     <h3>${course.name}</h3>
                     <p><strong>Lieu :</strong> ${course.location} (${course.region})</p>
                     <p><strong>Parcours :</strong> ${course.holes} trous — Par ${course.par}</p>
                     <p><strong>Fondation :</strong> ${course.yearFounded}</p>
+                    <p><strong>Rating :</strong> ${course.rating}</p>
                 </div>
             </article>
         `;
@@ -137,4 +167,19 @@ function afficherRessources() {
     listElement.innerHTML = html;
 }
 
-afficherRessources();
+function refresh() {
+    // Remove spaces
+    const query = searchInput.value.trim().toLowerCase();
+
+    let result = courses.filter(course =>
+        course.name.toLowerCase().includes(query)
+    );
+
+    result = [...result].sort((a, b) =>
+        sortAsc ? a.rating - b.rating : b.rating - a.rating
+    );
+
+    afficherRessources(result);
+}
+
+refresh();
