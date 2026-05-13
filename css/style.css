@@ -1,9 +1,15 @@
+/* VARIABLES ET BASE */
 :root {
     --primary-color: #2e8b57;
+    --primary-color-hover: #246c44;
     --bg-color: #f4f7f6;
     --card-bg: #ffffff;
     --text-color: #333333;
     --danger-color: #e74c3c;
+    --danger-color-hover: #c0392b;
+    --warning-color: #f39c12;
+    --warning-color-hover: #d68910;
+    --border-color: #d7e2dd;
 }
 
 * {
@@ -19,18 +25,23 @@ body {
     color: var(--text-color);
 }
 
+/* MISE EN PAGE PRINCIPALE */
 #list {
     display: grid;
-    grid-template-columns: 1fr; /* Affichage sur une seule colonne pour les mobiles */
+    grid-template-columns: 1fr;
+    /* Affichage sur une seule colonne pour les mobiles */
     gap: 20px;
-    list-style-type: none; /* Suppression des puces de la liste */
+    list-style-type: none;
+    /* Suppression des puces de la liste */
     padding: 0;
 }
 
+/* CARTES GOLF */
 .golf-card {
     background-color: var(--card-bg);
     border-radius: 8px;
-    overflow: hidden; /* Masquage des éléments qui débordent de la carte */
+    overflow: hidden;
+    /* Masquage des éléments qui débordent de la carte */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
@@ -45,108 +56,20 @@ body {
 .golf-card img {
     width: 100%;
     height: 200px;
-    object-fit: cover; /* Conservation des proportions de l'image */
+    object-fit: cover;
+    /* Conservation des proportions de l'image */
 }
 
 .card-content {
     padding: 15px;
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* Occupation de l'espace disponible */
+    flex-grow: 1;
+    /* Occupation de l'espace disponible */
     gap: 10px;
+    word-break: break-word;
 }
 
-.controls{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 20px;
-    gap: 20px;
-}
-
-.controls input{
-    width: min(420px, 90vw);
-    padding: 12px 14px;
-    border: 1.5px solid #d7e2dd;
-    border-radius: 12px;
-    background: #ffffff;
-    color: var(--text-color);
-    font-size: 1rem;
-    font-weight: 500;
-    outline: none;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-    transition: border-color 0.2s ease,
-}
-
-.controls button{
-    padding: 12px 14px;
-    border: 1.5px solid #d7e2dd;
-    border-radius: 12px;
-    background: #ffffff;
-    color: var(--text-color);
-    font-size: 1rem;
-    font-weight: 500;
-    outline: none;
-}
-
-/* Styling du formulaire d'ajout */
-#form-add-course {
-    background-color: var(--card-bg);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-#form-add-course h2 {
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 15px;
-}
-
-.form-group input,
-.form-group select {
-    padding: 10px;
-    border: 1px solid #d7e2dd;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-family: inherit;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.2);
-}
-
-#form-add-course button[type="submit"] {
-    width: 100%;
-    padding: 12px;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    margin-top: 10px;
-}
-
-#form-add-course button[type="submit"]:hover {
-    background-color: #246c44;
-}
-
-/* Boutons d'action sur la carte */
 .card-actions {
     display: flex;
     gap: 10px;
@@ -154,7 +77,8 @@ body {
     padding-top: 10px;
 }
 
-.btn-remove-course, .btn-edit-course {
+.btn-remove-course,
+.btn-edit-course {
     padding: 8px 15px;
     color: white;
     border: none;
@@ -169,18 +93,123 @@ body {
 }
 
 .btn-remove-course:hover {
-    background-color: #c0392b;
+    background-color: var(--danger-color-hover);
 }
 
 .btn-edit-course {
-    background-color: #f39c12;
+    background-color: var(--warning-color);
 }
 
 .btn-edit-course:hover {
-    background-color: #d68910;
+    background-color: var(--warning-color-hover);
 }
 
-/* Modal (popup) */
+/* CONTRÔLES */
+.controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+    gap: 20px;
+}
+
+.controls input {
+    width: min(420px, 90vw);
+    padding: 12px 14px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 500;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    transition: border-color 0.2s ease;
+}
+
+.controls button {
+    padding: 12px 14px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+}
+
+#btn-show-add-modal {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    transition: background-color 0.2s ease;
+}
+
+#btn-show-add-modal:hover {
+    background-color: var(--primary-color-hover);
+}
+
+/* FORMULAIRES */
+#form-add-course h2,
+#form-edit-course h2 {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 15px;
+}
+
+.form-group input,
+.form-group select {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.2);
+}
+
+#form-add-course button[type="submit"],
+#form-edit-course button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 10px;
+}
+
+#form-add-course button[type="submit"] {
+    background-color: var(--primary-color);
+}
+
+#form-add-course button[type="submit"]:hover {
+    background-color: var(--primary-color-hover);
+}
+
+#form-edit-course button[type="submit"] {
+    background-color: var(--warning-color);
+}
+
+#form-edit-course button[type="submit"]:hover {
+    background-color: var(--warning-color-hover);
+}
+
+/* FENÊTRES MODALES */
 .modal {
     position: fixed;
     z-index: 1000;
@@ -192,6 +221,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    animation: modalBgFadeIn 0.2s ease-out;
 }
 
 .modal.hidden {
@@ -204,8 +234,11 @@ body {
     border-radius: 8px;
     width: 90%;
     max-width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
     position: relative;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    animation: modalFadeIn 0.3s ease-out;
 }
 
 .close-btn {
@@ -221,31 +254,53 @@ body {
     color: var(--text-color);
 }
 
-#form-edit-course button[type="submit"] {
-    width: 100%;
-    padding: 12px;
-    background-color: #f39c12;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    margin-top: 10px;
+@keyframes modalBgFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
-#form-edit-course button[type="submit"]:hover {
-    background-color: #d68910;
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
+/* MESSAGES D'ERREUR ET VALIDATION */
+.error-msg {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: 4px;
+    display: none;
+}
+
+.error-msg.visible {
+    display: block;
+}
+
+.input-error {
+    border-color: var(--danger-color) !important;
+}
+
+/* RESPONSIVE DESIGN */
 @media (min-width: 768px) {
     #list {
-        grid-template-columns: repeat(2, 1fr); /* Affichage sur 2 colonnes pour les tablettes */
+        grid-template-columns: repeat(2, 1fr);
+        /* Affichage sur 2 colonnes pour les tablettes */
     }
 }
 
 @media (min-width: 1024px) {
     #list {
-        grid-template-columns: repeat(3, 1fr); /* Affichage sur 3 colonnes pour les grands écrans */
+        grid-template-columns: repeat(3, 1fr);
+        /* Affichage sur 3 colonnes pour les grands écrans */
     }
 }

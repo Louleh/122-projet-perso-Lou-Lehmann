@@ -16,64 +16,77 @@
   <main>
     <div class="controls">
       <input type="text" id="search" placeholder="Rechercher un parcours...">
-      <button id="btn-sort">Trier par note ↓</button>
+      <div style="display: flex; gap: 10px;">
+        <button id="btn-sort">Trier par note ↓</button>
+        <button id="btn-show-add-modal">Ajouter un parcours</button>
+      </div>
     </div>
-
-    <form id="form-add-course">
-      <h2>Ajouter un parcours</h2>
-
-      <div class="form-group">
-        <label for="input-course-name">Nom du golf</label>
-        <input type="text" id="input-course-name" placeholder="Ex : Golf Club Verbier" required>
-      </div>
-
-      <div class="form-group">
-        <label for="input-course-location">Lieu</label>
-        <input type="text" id="input-course-location" placeholder="Ex : Verbier" required>
-      </div>
-
-      <div class="form-group">
-        <label for="input-course-region">Région</label>
-        <select id="input-course-region">
-          <option value="Valais">Valais</option>
-          <option value="Vaud">Vaud</option>
-          <option value="Genève">Genève</option>
-          <option value="Grisons">Grisons</option>
-          <option value="Tessin">Tessin</option>
-          <option value="Berne">Berne</option>
-          <option value="Zurich">Zurich</option>
-          <option value="Autre">Autre</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="input-course-holes">Trous</label>
-        <select id="input-course-holes">
-          <option value="18">18 trous</option>
-          <option value="9">9 trous</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="input-course-par">Par</label>
-        <input type="number" id="input-course-par" placeholder="Ex: 72" required>
-      </div>
-
-      <div class="form-group">
-        <label for="input-course-year">Année de fondation</label>
-        <input type="number" id="input-course-year" placeholder="Ex: 1995" min="1" step="1" required>
-      </div>
-
-      <div class="form-group">
-        <label for="input-course-rating">Note (1–5)</label>
-        <input type="number" id="input-course-rating" min="1" max="5" placeholder="5" required>
-      </div>
-
-      <button type="submit" id="btn-submit-course">Ajouter au catalogue</button>
-    </form>
 
     <ul id="list"></ul>
   </main>
+
+  <div id="add-modal" class="modal hidden">
+    <div class="modal-content">
+      <span id="close-add-modal" class="close-btn">&times;</span>
+      <form id="form-add-course">
+        <h2>Ajouter un parcours</h2>
+
+        <div class="form-group">
+          <label for="input-course-name">Nom du golf</label>
+          <input type="text" id="input-course-name" placeholder="Ex : Golf Club Verbier">
+          <span class="error-msg" id="error-input-name"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="input-course-location">Lieu</label>
+          <input type="text" id="input-course-location" placeholder="Ex : Verbier">
+          <span class="error-msg" id="error-input-location"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="input-course-region">Région</label>
+          <select id="input-course-region">
+            <option value="Valais">Valais</option>
+            <option value="Vaud">Vaud</option>
+            <option value="Genève">Genève</option>
+            <option value="Grisons">Grisons</option>
+            <option value="Tessin">Tessin</option>
+            <option value="Berne">Berne</option>
+            <option value="Zurich">Zurich</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="input-course-holes">Trous</label>
+          <select id="input-course-holes">
+            <option value="18">18 trous</option>
+            <option value="9">9 trous</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="input-course-par">Par</label>
+          <input type="number" id="input-course-par" placeholder="Ex: 72">
+          <span class="error-msg" id="error-input-par"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="input-course-year">Année de fondation</label>
+          <input type="number" id="input-course-year" placeholder="Ex: 1995" step="1">
+          <span class="error-msg" id="error-input-year"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="input-course-rating">Note (1–5)</label>
+          <input type="number" id="input-course-rating" placeholder="5">
+          <span class="error-msg" id="error-input-rating"></span>
+        </div>
+
+        <button type="submit" id="btn-submit-course">Ajouter au catalogue</button>
+      </form>
+    </div>
+  </div>
 
   <div id="edit-modal" class="modal hidden">
     <div class="modal-content">
@@ -84,12 +97,28 @@
 
         <div class="form-group">
           <label for="edit-course-name">Nom du golf</label>
-          <input type="text" id="edit-course-name" required>
+          <input type="text" id="edit-course-name">
+          <span class="error-msg" id="error-edit-name"></span>
         </div>
 
         <div class="form-group">
           <label for="edit-course-location">Lieu</label>
-          <input type="text" id="edit-course-location" required>
+          <input type="text" id="edit-course-location">
+          <span class="error-msg" id="error-edit-location"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-course-region">Région</label>
+          <select id="edit-course-region">
+            <option value="Valais">Valais</option>
+            <option value="Vaud">Vaud</option>
+            <option value="Genève">Genève</option>
+            <option value="Grisons">Grisons</option>
+            <option value="Tessin">Tessin</option>
+            <option value="Berne">Berne</option>
+            <option value="Zurich">Zurich</option>
+            <option value="Autre">Autre</option>
+          </select>
         </div>
 
         <div class="form-group">
@@ -102,17 +131,20 @@
 
         <div class="form-group">
           <label for="edit-course-par">Par</label>
-          <input type="number" id="edit-course-par" required>
+          <input type="number" id="edit-course-par">
+          <span class="error-msg" id="error-edit-par"></span>
         </div>
 
         <div class="form-group">
           <label for="edit-course-year">Année de fondation</label>
-          <input type="number" id="edit-course-year" min="1" step="1" required>
+          <input type="number" id="edit-course-year" step="1">
+          <span class="error-msg" id="error-edit-year"></span>
         </div>
 
         <div class="form-group">
           <label for="edit-course-rating">Note (1–5)</label>
-          <input type="number" id="edit-course-rating" min="1" max="5" required>
+          <input type="number" id="edit-course-rating">
+          <span class="error-msg" id="error-edit-rating"></span>
         </div>
 
         <button type="submit" id="btn-submit-edit">Enregistrer</button>
