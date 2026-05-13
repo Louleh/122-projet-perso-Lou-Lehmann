@@ -1,6 +1,10 @@
 "use strict";
 
-// Données initiales
+// VARIABLES D'ÉTAT ET DONNÉES
+
+let sortAsc = false;
+const currentYear = new Date().getFullYear();
+
 let courses = [
     {
         id: 1,
@@ -122,23 +126,27 @@ let courses = [
         image: "assets/img/GC_Interlaken.webp",
         credit: "https://www.interlakengolf.ch/"
     }
-
 ];
 
-const listElement = document.querySelector("#list");
+// SÉLECTION DES ÉLÉMENTS DU DOM
+
+// Interface principale
+const listElement = document.getElementById("list");
 const btnSort = document.getElementById("btn-sort");
 const searchInput = document.getElementById("search");
 
-let sortAsc = false;
+// Modales et boutons
+const addModal = document.getElementById("add-modal");
+const editModal = document.getElementById("edit-modal");
+const btnShowAddModal = document.getElementById("btn-show-add-modal");
+const closeAddModalBtn = document.getElementById("close-add-modal");
+const closeEditModalBtn = document.getElementById("close-modal");
 
-// Initialisation des écouteurs d'événements globaux
-searchInput.addEventListener("input", refresh);
+// Formulaires
+const formAddCourse = document.getElementById("form-add-course");
+const formEditCourse = document.getElementById("form-edit-course");
 
-btnSort.addEventListener("click", () => {
-    sortAsc = !sortAsc;
-    btnSort.textContent = sortAsc ? "Trier par note ↑" : "Trier par note ↓";
-    refresh();
-});
+// FONCTIONS PRINCIPALES
 
 function afficherRessources(dataToDisplay) {
     let html = "";
@@ -168,11 +176,11 @@ function afficherRessources(dataToDisplay) {
         `;
     }
 
+    // Ajout du html généré dans le conteneur
     listElement.innerHTML = html;
 }
 
 function refresh() {
-    // Nettoyage de la saisie utilisateur
     const query = searchInput.value.trim().toLowerCase();
 
     let result = courses.filter(course =>
@@ -186,137 +194,244 @@ function refresh() {
     afficherRessources(result);
 }
 
-refresh();
+// FONCTIONS DE VALIDATION
 
-// --- GESTION DE L'AJOUT ---
-const formAddCourse = document.getElementById("form-add-course");
-const inputCourseName = document.getElementById("input-course-name");
-const inputCourseLocation = document.getElementById("input-course-location");
-const inputCourseRegion = document.getElementById("input-course-region");
-const inputCourseHoles = document.getElementById("input-course-holes");
-const inputCoursePar = document.getElementById("input-course-par");
-const inputCourseYearFounded = document.getElementById("input-course-year");
-const inputCourseRating = document.getElementById("input-course-rating");
+function clearErrors(prefix) {
+    const fields = ["name", "location", "par", "year", "rating"];
+    fields.forEach(field => {
+        const input = document.getElementById(`${prefix}-course-${field}`);
+        const errorSpan = document.getElementById(`error-${prefix}-${field}`);
+        if (input) input.classList.remove("input-error");
+        if (errorSpan) {
+            errorSpan.textContent = "";
+            errorSpan.classList.remove("visible");
+        }
+    });
+}
 
-const currentYear = new Date().getFullYear();
-if (inputCourseYearFounded) inputCourseYearFounded.max = currentYear;
-const editCourseYear = document.getElementById("edit-course-year");
-if (editCourseYear) editCourseYear.max = currentYear;
+function validateCourseForm(prefix) {
+    let isValid = true;
 
+    const setError = (field, msg) => {
+        const input = document.getElementById(`${prefix}-course-${field}`);
+        const errorSpan = document.getElementById(`error-${prefix}-${field}`);
+        if (!input || !errorSpan) return;
+        input.classList.add("input-error");
+        errorSpan.textContent = msg;
+        errorSpan.classList.add("visible");
+        isValid = false;
+    };
+
+    clearErrors(prefix);
+
+    const nameInput = document.getElementById(`${prefix}-course-name`);
+    const locationInput = document.getElementById(`${prefix}-course-location`);
+    const parInput = document.getElementById(`${prefix}-course-par`);
+    const yearInput = document.getElementById(`${prefix}-course-year`);
+    const ratingInput = document.getElementById(`${prefix}-course-rating`);
+
+    if (!nameInput.value.trim()) {
+        setError("name", "Le nom est obligatoire.");
+    }
+
+    if (!locationInput.value.trim()) {
+        setError("location", "Le lieu est obligatoire.");
+    }
+
+    if (parInput.value.trim() === "") {
+        setError("par", "Le par est obligatoire.");
+    } else {
+        const parVal = Number(parInput.value);
+        if (parVal <= 0 || !Number.isInteger(parVal)) {
+            setError("par", "Doit être un entier positif.");
+        }
+    }
+
+    if (yearInput.value.trim() === "") {
+        setError("year", "L'année est obligatoire.");
+    } else {
+        const yearVal = Number(yearInput.value);
+        if (yearVal < 1 || yearVal > currentYear || !Number.isInteger(yearVal)) {
+            setError("year", `Année invalide (1 - ${currentYear}).`);
+        }
+    }
+
+    if (ratingInput.value.trim() === "") {
+        setError("rating", "La note est obligatoire.");
+    } else {
+        const ratingVal = Number(ratingInput.value);
+        if (ratingVal < 1 || ratingVal > 5 || !Number.isInteger(ratingVal)) {
+            setError("rating", "Note entre 1 et 5.");
+        }
+    }
+
+    return isValid;
+}
+
+// ÉCOUTEURS D'ÉVÉNEMENTS
+
+// Barre de recherche et tri
+if (searchInput) {
+    searchInput.addEventListener("input", refresh);
+}
+
+if (btnSort) {
+    btnSort.addEventListener("click", () => {
+        sortAsc = !sortAsc;
+        btnSort.textContent = sortAsc ? "Trier par note ↑" : "Trier par note ↓";
+        refresh();
+    });
+}
+
+// Modales : Ouvertures et fermetures
+if (btnShowAddModal && addModal) {
+    btnShowAddModal.addEventListener("click", () => {
+        clearErrors("input");
+        addModal.classList.remove("hidden");
+    });
+}
+
+if (closeEditModalBtn && editModal) {
+    closeEditModalBtn.addEventListener("click", () => {
+        editModal.classList.add("hidden");
+    });
+}
+
+if (closeAddModalBtn && addModal) {
+    closeAddModalBtn.addEventListener("click", () => {
+        addModal.classList.add("hidden");
+    });
+}
+
+window.addEventListener("click", (e) => {
+    if (editModal && e.target === editModal) {
+        editModal.classList.add("hidden");
+    }
+    if (addModal && e.target === addModal) {
+        addModal.classList.add("hidden");
+    }
+});
+
+// Formulaire : Ajout d'un parcours
 if (formAddCourse) {
     formAddCourse.addEventListener("submit", (e) => {
         e.preventDefault();
 
-        const year = Number(inputCourseYearFounded.value);
-        if (year < 1 || year > currentYear || !Number.isInteger(year)) {
-            alert(`Veuillez entrer une année valide (entre 1 et ${currentYear}).`);
+        if (!validateCourseForm("input")) {
             return;
         }
 
+        const inputName = document.getElementById("input-course-name").value.trim();
+
         const newCourse = {
             id: Date.now(),
-            name: inputCourseName.value.trim(),
-            location: inputCourseLocation.value.trim(),
-            region: inputCourseRegion.value,
-            holes: Number(inputCourseHoles.value),
-            par: Number(inputCoursePar.value),
-            rating: Number(inputCourseRating.value),
-            yearFounded: Number(inputCourseYearFounded.value),
-            image: `https://placehold.co/600x400/2e8b57/white?text=${encodeURIComponent(inputCourseName.value.trim())}`,
+            name: inputName,
+            location: document.getElementById("input-course-location").value.trim(),
+            region: document.getElementById("input-course-region").value,
+            holes: Number(document.getElementById("input-course-holes").value),
+            par: Number(document.getElementById("input-course-par").value),
+            rating: Number(document.getElementById("input-course-rating").value),
+            yearFounded: Number(document.getElementById("input-course-year").value),
+            image: `https://placehold.co/600x400/2e8b57/white?text=${encodeURIComponent(inputName)}`,
             credit: "#"
         };
 
         courses.push(newCourse);
         refresh();
         formAddCourse.reset();
+
+        if (addModal) {
+            addModal.classList.add("hidden");
+        }
     });
 }
 
-// --- GESTION DE LA MODIFICATION ET SUPPRESSION ---
-listElement.addEventListener("click", (e) => {
-    // Traitement de l'action "Modifier"
-    const editBtn = e.target.closest(".btn-edit-course");
-    if (editBtn) {
-        const articleCard = editBtn.closest(".golf-card");
-        const courseId = Number(articleCard.dataset.id);
+// Formulaire : Modification d'un parcours
+if (formEditCourse) {
+    formEditCourse.addEventListener("submit", (e) => {
+        e.preventDefault();
 
-        // Récupération et pré-remplissage des données
-        const courseToEdit = courses.find(c => c.id === courseId);
-        if (courseToEdit) {
-            document.getElementById("edit-course-id").value = courseToEdit.id;
-            document.getElementById("edit-course-name").value = courseToEdit.name;
-            document.getElementById("edit-course-location").value = courseToEdit.location;
-            document.getElementById("edit-course-holes").value = courseToEdit.holes;
-            document.getElementById("edit-course-par").value = courseToEdit.par;
-            document.getElementById("edit-course-year").value = courseToEdit.yearFounded;
-            document.getElementById("edit-course-rating").value = courseToEdit.rating;
-
-            // Affichage de la fenêtre modale
-            document.getElementById("edit-modal").classList.remove("hidden");
+        if (!validateCourseForm("edit")) {
+            return;
         }
-        return; // Arrêt de l'exécution pour ne pas déclencher d'autres actions
-    }
 
-    // Traitement de l'action "Supprimer"
-    const deleteBtn = e.target.closest(".btn-remove-course");
-    if (deleteBtn) {
-        const articleCard = deleteBtn.closest(".golf-card");
-        const courseId = Number(articleCard.dataset.id);
+        const idToUpdate = Number(document.getElementById("edit-course-id").value);
+        const index = courses.findIndex(c => c.id === idToUpdate);
 
-        if (confirm("Voulez-vous vraiment supprimer ce parcours ?")) {
-            // Mise à jour de la liste sans l'élément supprimé
-            courses = courses.filter(course => course.id !== courseId);
+        if (index !== -1) {
+            const newName = document.getElementById("edit-course-name").value.trim();
+
+            courses[index].name = newName;
+            courses[index].location = document.getElementById("edit-course-location").value.trim();
+            courses[index].region = document.getElementById("edit-course-region").value;
+            courses[index].holes = Number(document.getElementById("edit-course-holes").value);
+            courses[index].par = Number(document.getElementById("edit-course-par").value);
+            courses[index].yearFounded = Number(document.getElementById("edit-course-year").value);
+            courses[index].rating = Number(document.getElementById("edit-course-rating").value);
+
+            // Mise à jour conditionnelle de l'image (si c'est un placeholder)
+            if (courses[index].image.includes("placehold.co")) {
+                courses[index].image = `https://placehold.co/600x400/2e8b57/white?text=${encodeURIComponent(newName)}`;
+            }
+
             refresh();
+            if (editModal) {
+                editModal.classList.add("hidden");
+            }
         }
-    }
-});
+    });
+}
 
-// --- GESTION DE LA FENÊTRE MODALE ---
-const editModal = document.getElementById("edit-modal");
-const closeModal = document.getElementById("close-modal");
-const formEditCourse = document.getElementById("form-edit-course");
+// Liste : Délégation d'événements
+if (listElement) {
+    listElement.addEventListener("click", (e) => {
 
-// Fermeture via le bouton X
-closeModal.addEventListener("click", () => {
-    editModal.classList.add("hidden");
-});
+        // Modification
+        const editBtn = e.target.closest(".btn-edit-course");
+        if (editBtn) {
+            const articleCard = editBtn.closest(".golf-card");
+            const courseId = Number(articleCard.dataset.id);
 
-// Fermeture via un clic à l'extérieur
-window.addEventListener("click", (e) => {
-    if (e.target === editModal) {
-        editModal.classList.add("hidden");
-    }
-});
+            const courseToEdit = courses.find(c => c.id === courseId);
+            if (courseToEdit) {
+                document.getElementById("edit-course-id").value = courseToEdit.id;
+                document.getElementById("edit-course-name").value = courseToEdit.name;
+                document.getElementById("edit-course-location").value = courseToEdit.location;
+                document.getElementById("edit-course-region").value = courseToEdit.region;
+                document.getElementById("edit-course-holes").value = courseToEdit.holes;
+                document.getElementById("edit-course-par").value = courseToEdit.par;
+                document.getElementById("edit-course-year").value = courseToEdit.yearFounded;
+                document.getElementById("edit-course-rating").value = courseToEdit.rating;
 
-// Traitement de la sauvegarde des modifications
-formEditCourse.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const year = Number(document.getElementById("edit-course-year").value);
-    if (year < 1 || year > currentYear || !Number.isInteger(year)) {
-        alert(`Veuillez entrer une année valide (entre 1 et ${currentYear}).`);
-        return;
-    }
-
-    const idToUpdate = Number(document.getElementById("edit-course-id").value);
-    const index = courses.findIndex(c => c.id === idToUpdate);
-
-    if (index !== -1) {
-        const newName = document.getElementById("edit-course-name").value.trim();
-
-        courses[index].name = newName;
-        courses[index].location = document.getElementById("edit-course-location").value.trim();
-        courses[index].holes = Number(document.getElementById("edit-course-holes").value);
-        courses[index].par = Number(document.getElementById("edit-course-par").value);
-        courses[index].yearFounded = Number(document.getElementById("edit-course-year").value);
-        courses[index].rating = Number(document.getElementById("edit-course-rating").value);
-
-        // Rafraîchissement conditionnel de l'image de remplacement
-        if (courses[index].image.includes("placehold.co")) {
-            courses[index].image = `https://placehold.co/600x400/2e8b57/white?text=${encodeURIComponent(newName)}`;
+                clearErrors("edit");
+                if (editModal) {
+                    editModal.classList.remove("hidden");
+                }
+            }
+            return;
         }
 
-        refresh();
-        editModal.classList.add("hidden");
-    }
-});
+        // Suppression
+        const deleteBtn = e.target.closest(".btn-remove-course");
+        if (deleteBtn) {
+            const articleCard = deleteBtn.closest(".golf-card");
+            const courseId = Number(articleCard.dataset.id);
+
+            if (confirm("Voulez-vous vraiment supprimer ce parcours ?")) {
+                courses = courses.filter(course => course.id !== courseId);
+                refresh();
+            }
+        }
+    });
+}
+
+// INITIALISATION DE L'APPLICATION
+// Injection des limites dynamiques sur les dates
+
+const inputCourseYear = document.getElementById("input-course-year");
+const editCourseYearInit = document.getElementById("edit-course-year");
+if (inputCourseYear) inputCourseYear.max = currentYear;
+if (editCourseYearInit) editCourseYearInit.max = currentYear;
+
+// Premier affichage
+refresh();
