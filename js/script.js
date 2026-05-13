@@ -11,6 +11,7 @@ let courses = [
         name: "Golf Club Crans-sur-Sierre",
         location: "Crans-Montana",
         region: "Valais",
+        type: "Parcours",
         holes: 18,
         par: 70,
         rating: 5,
@@ -23,6 +24,7 @@ let courses = [
         name: "Golf Club de Sion",
         location: "Sion",
         region: "Valais",
+        type: "Parcours",
         holes: 18,
         par: 72,
         rating: 4,
@@ -35,6 +37,7 @@ let courses = [
         name: "Golf Club Lausanne",
         location: "Lausanne",
         region: "Vaud",
+        type: "Parcours",
         holes: 18,
         par: 71,
         rating: 5,
@@ -47,6 +50,7 @@ let courses = [
         name: "Golf Club Montreux",
         location: "Aigle",
         region: "Vaud",
+        type: "Parcours",
         holes: 18,
         par: 72,
         rating: 4,
@@ -59,9 +63,10 @@ let courses = [
         name: "Golf Club de Geneve",
         location: "Vandoeuvres",
         region: "Geneve",
+        type: "Parcours",
         holes: 18,
         par: 72,
-        rating: 5,
+        rating: 4,
         yearFounded: 1922,
         image: "assets/img/GC_Geneve.webp",
         credit: "https://golfgeneve.ch/"
@@ -71,6 +76,7 @@ let courses = [
         name: "Golf Club de Bonmont",
         location: "Cheserex",
         region: "Vaud",
+        type: "Parcours",
         holes: 18,
         par: 72,
         rating: 3,
@@ -83,6 +89,7 @@ let courses = [
         name: "Golf Club Zurich-Zumikon",
         location: "Zumikon",
         region: "Zurich",
+        type: "Parcours",
         holes: 18,
         par: 72,
         rating: 4,
@@ -95,6 +102,7 @@ let courses = [
         name: "Golf Club Domat-Ems",
         location: "Domat-Ems",
         region: "Grisons",
+        type: "Parcours",
         holes: 18,
         par: 70,
         rating: 3,
@@ -107,6 +115,7 @@ let courses = [
         name: "Golf Club Lugano",
         location: "Magliaso",
         region: "Tessin",
+        type: "Parcours",
         holes: 18,
         par: 70,
         rating: 4,
@@ -119,12 +128,26 @@ let courses = [
         name: "Golf Club Interlaken-Unterseen",
         location: "Unterseen",
         region: "Berne",
+        type: "Parcours",
         holes: 18,
         par: 69,
         rating: 2,
         yearFounded: 1963,
         image: "assets/img/GC_Interlaken.webp",
         credit: "https://www.interlakengolf.ch/"
+    },
+    {
+        id: 11,
+        name: "Practice Golf Club Bassecourt",
+        location: "Bassecourt",
+        region: "Jura",
+        type: "Practice",
+        holes: 0,
+        par: 0,
+        rating: 5,
+        yearFounded: 1993,
+        image: "assets/img/PC_Bassecourt.webp",
+        credit: "https://practice-bassecourt.ch/le-club/"
     }
 ];
 
@@ -134,6 +157,8 @@ let courses = [
 const listElement = document.getElementById("list");
 const btnSort = document.getElementById("btn-sort");
 const searchInput = document.getElementById("search");
+const filterRegion = document.getElementById("filter-region");
+const filterType = document.getElementById("filter-type");
 
 // Modales et boutons
 const addModal = document.getElementById("add-modal");
@@ -157,6 +182,10 @@ function afficherRessources(dataToDisplay) {
     }
 
     for (const course of dataToDisplay) {
+        const detailsHolesPar = course.type === "Practice"
+            ? `<p><strong>Type :</strong> Practice</p>`
+            : `<p><strong>Parcours :</strong> ${course.holes} trous — Par ${course.par}</p>`;
+
         html += `
             <article class="golf-card" data-id="${course.id}">
                 <img src="${course.image}" alt="Photo du ${course.name}">
@@ -164,7 +193,7 @@ function afficherRessources(dataToDisplay) {
                 <div class="card-content">
                     <h3>${course.name}</h3>
                     <p><strong>Lieu :</strong> ${course.location} (${course.region})</p>
-                    <p><strong>Parcours :</strong> ${course.holes} trous — Par ${course.par}</p>
+                    ${detailsHolesPar}
                     <p><strong>Fondation :</strong> ${course.yearFounded}</p>
                     <p><strong>Rating :</strong> ${course.rating}</p>
                     <div class="card-actions">
@@ -181,11 +210,21 @@ function afficherRessources(dataToDisplay) {
 }
 
 function refresh() {
-    const query = searchInput.value.trim().toLowerCase();
+    const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+    const region = filterRegion ? filterRegion.value : "";
+    const type = filterType ? filterType.value : "";
 
     let result = courses.filter(course =>
         course.name.toLowerCase().includes(query)
     );
+
+    if (region !== "") {
+        result = result.filter(course => course.region === region);
+    }
+    
+    if (type !== "") {
+        result = result.filter(course => course.type === type);
+    }
 
     result = [...result].sort((a, b) =>
         sortAsc ? a.rating - b.rating : b.rating - a.rating
@@ -197,7 +236,7 @@ function refresh() {
 // FONCTIONS DE VALIDATION
 
 function clearErrors(prefix) {
-    const fields = ["name", "location", "par", "year", "rating"];
+    const fields = ["name", "location", "par", "year", "rating", "holes"];
     fields.forEach(field => {
         const input = document.getElementById(`${prefix}-course-${field}`);
         const errorSpan = document.getElementById(`error-${prefix}-${field}`);
@@ -209,8 +248,23 @@ function clearErrors(prefix) {
     });
 }
 
+function toggleHolesParVisibility(prefix) {
+    const typeSelect = document.getElementById(`${prefix}-course-type`);
+    const groupHoles = document.getElementById(`${prefix === "input" ? "input" : "edit"}-group-holes`);
+    const groupPar = document.getElementById(`${prefix === "input" ? "input" : "edit"}-group-par`);
+
+    if (typeSelect && groupHoles && groupPar) {
+        const isPractice = typeSelect.value === "Practice";
+        groupHoles.style.display = isPractice ? "none" : "flex";
+        groupPar.style.display = isPractice ? "none" : "flex";
+    }
+}
+
 function validateCourseForm(prefix) {
     let isValid = true;
+
+    const typeInput = document.getElementById(`${prefix}-course-type`);
+    const isPractice = typeInput && typeInput.value === "Practice";
 
     const setError = (field, msg) => {
         const input = document.getElementById(`${prefix}-course-${field}`);
@@ -227,6 +281,7 @@ function validateCourseForm(prefix) {
     const nameInput = document.getElementById(`${prefix}-course-name`);
     const locationInput = document.getElementById(`${prefix}-course-location`);
     const parInput = document.getElementById(`${prefix}-course-par`);
+    const holesInput = document.getElementById(`${prefix}-course-holes`);
     const yearInput = document.getElementById(`${prefix}-course-year`);
     const ratingInput = document.getElementById(`${prefix}-course-rating`);
 
@@ -238,12 +293,21 @@ function validateCourseForm(prefix) {
         setError("location", "Le lieu est obligatoire.");
     }
 
-    if (parInput.value.trim() === "") {
-        setError("par", "Le par est obligatoire.");
-    } else {
-        const parVal = Number(parInput.value);
-        if (parVal <= 0 || !Number.isInteger(parVal)) {
-            setError("par", "Doit être un entier positif.");
+    if (!isPractice) {
+        if (parInput.value.trim() === "") {
+            setError("par", "Le par est obligatoire.");
+        } else {
+            const parVal = Number(parInput.value);
+            if (parVal <= 0 || !Number.isInteger(parVal)) {
+                setError("par", "Doit être un entier positif.");
+            }
+        }
+        
+        if (holesInput) {
+            const holesVal = Number(holesInput.value);
+            if (holesVal !== 9 && holesVal !== 18) {
+                setError("holes", "Un parcours ne peut avoir que 9 ou 18 trous.");
+            }
         }
     }
 
@@ -275,6 +339,24 @@ if (searchInput) {
     searchInput.addEventListener("input", refresh);
 }
 
+if (filterRegion) {
+    filterRegion.addEventListener("change", refresh);
+}
+
+if (filterType) {
+    filterType.addEventListener("change", refresh);
+}
+
+const inputCourseType = document.getElementById("input-course-type");
+if (inputCourseType) {
+    inputCourseType.addEventListener("change", () => toggleHolesParVisibility("input"));
+}
+
+const editCourseType = document.getElementById("edit-course-type");
+if (editCourseType) {
+    editCourseType.addEventListener("change", () => toggleHolesParVisibility("edit"));
+}
+
 if (btnSort) {
     btnSort.addEventListener("click", () => {
         sortAsc = !sortAsc;
@@ -287,6 +369,8 @@ if (btnSort) {
 if (btnShowAddModal && addModal) {
     btnShowAddModal.addEventListener("click", () => {
         clearErrors("input");
+        if (inputCourseType) inputCourseType.value = "Parcours";
+        toggleHolesParVisibility("input");
         addModal.classList.remove("hidden");
     });
 }
@@ -322,14 +406,16 @@ if (formAddCourse) {
         }
 
         const inputName = document.getElementById("input-course-name").value.trim();
+        const typeValue = document.getElementById("input-course-type").value;
 
         const newCourse = {
             id: Date.now(),
             name: inputName,
+            type: typeValue,
             location: document.getElementById("input-course-location").value.trim(),
             region: document.getElementById("input-course-region").value,
-            holes: Number(document.getElementById("input-course-holes").value),
-            par: Number(document.getElementById("input-course-par").value),
+            holes: typeValue === "Practice" ? 0 : Number(document.getElementById("input-course-holes").value),
+            par: typeValue === "Practice" ? 0 : Number(document.getElementById("input-course-par").value),
             rating: Number(document.getElementById("input-course-rating").value),
             yearFounded: Number(document.getElementById("input-course-year").value),
             image: `https://placehold.co/600x400/2e8b57/white?text=${encodeURIComponent(inputName)}`,
@@ -361,11 +447,12 @@ if (formEditCourse) {
         if (index !== -1) {
             const newName = document.getElementById("edit-course-name").value.trim();
 
+            courses[index].type = document.getElementById("edit-course-type").value;
             courses[index].name = newName;
             courses[index].location = document.getElementById("edit-course-location").value.trim();
             courses[index].region = document.getElementById("edit-course-region").value;
-            courses[index].holes = Number(document.getElementById("edit-course-holes").value);
-            courses[index].par = Number(document.getElementById("edit-course-par").value);
+            courses[index].holes = courses[index].type === "Practice" ? 0 : Number(document.getElementById("edit-course-holes").value);
+            courses[index].par = courses[index].type === "Practice" ? 0 : Number(document.getElementById("edit-course-par").value);
             courses[index].yearFounded = Number(document.getElementById("edit-course-year").value);
             courses[index].rating = Number(document.getElementById("edit-course-rating").value);
 
@@ -395,6 +482,7 @@ if (listElement) {
             const courseToEdit = courses.find(c => c.id === courseId);
             if (courseToEdit) {
                 document.getElementById("edit-course-id").value = courseToEdit.id;
+                document.getElementById("edit-course-type").value = courseToEdit.type || "Parcours";
                 document.getElementById("edit-course-name").value = courseToEdit.name;
                 document.getElementById("edit-course-location").value = courseToEdit.location;
                 document.getElementById("edit-course-region").value = courseToEdit.region;
@@ -403,6 +491,7 @@ if (listElement) {
                 document.getElementById("edit-course-year").value = courseToEdit.yearFounded;
                 document.getElementById("edit-course-rating").value = courseToEdit.rating;
 
+                toggleHolesParVisibility("edit");
                 clearErrors("edit");
                 if (editModal) {
                     editModal.classList.remove("hidden");
